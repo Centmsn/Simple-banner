@@ -27,6 +27,11 @@
     transform: translateY(25%);
     font-size: 3rem;
     background-color: rgba(0, 0, 0, 0.6);
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -o-user-select: none;
+    user-select: none;
   }
   &__title {
     flex-basis: 80%;

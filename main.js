@@ -1,4 +1,4 @@
-//banner info
+//interface
 const banner = [
   {
     img: "./20190210_120856.jpg", //0
@@ -17,18 +17,14 @@ const banner = [
   },
   // add more slides
   // {
-  //   img: "./IMG_20161030_115455.jpg",
-  //   header: "Czwarta fotka lasu",
+  //   img: "path",
+  //   header: "description",
+  //   link: "link",
   // },
 ];
 
-const bannerBackground = document.querySelector(".banner");
-const bannerHeader = document.querySelector(".banner__title");
-const arrows = [...document.querySelectorAll(".banner__arrow")];
-//interface
-let active = 0; //start img num
-let timer = 4000; //time between img change
-
+let active = 0; // slide number to start from
+let timer = 4000; //time between slide change
 window.addEventListener("DOMContentLoaded", () => {
   const changeSlide = () => {
     if (active >= banner.length) {
@@ -55,10 +51,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const header = document.createElement("a");
     header.classList.add("banner__desc");
     header.setAttribute("href", banner[active]["link"]);
+    header.setAttribute("target", "_blank");
     header.textContent = banner[active]["header"];
     bannerHeader.appendChild(header);
   }
-  //dots are clickable
   function clickDot() {
     clearInterval(setter);
     if (this.classList.contains("banner__dots--active")) {
@@ -69,21 +65,18 @@ window.addEventListener("DOMContentLoaded", () => {
       setter = setInterval(changeSlide, timer);
     }
   }
-  //side arrows
   function clickArrow() {
-    clearInterval(setter); //reset interval
+    clearInterval(setter);
     const activeDot = dots.findIndex((dot) =>
       dot.classList.contains("banner__dots--active")
-    ); //index of active dot
+    );
     if (this.dataset.direction === "left") {
-      //if left arrow
       if (activeDot > 0) {
         active = activeDot - 1;
       } else {
         active = banner.length - 1;
       }
     } else {
-      //if right arrow
       if (activeDot < banner.length - 1) {
         active = activeDot + 1;
       } else {
@@ -91,7 +84,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     }
     changeSlide();
-    setter = setInterval(changeSlide, timer); // setInterval
+    setter = setInterval(changeSlide, timer);
   }
 
   const createDots = () => {
@@ -110,3 +103,7 @@ window.addEventListener("DOMContentLoaded", () => {
   let setter = setInterval(changeSlide, timer);
   arrows.forEach((arrow) => arrow.addEventListener("click", clickArrow));
 });
+
+const bannerBackground = document.querySelector(".banner");
+const bannerHeader = document.querySelector(".banner__title");
+const arrows = [...document.querySelectorAll(".banner__arrow")];
