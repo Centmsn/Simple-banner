@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+// change banner theme
+$banner-main-color: rgba(0, 0, 0, 1);
+$banner-secondary-color: rgba(255, 255, 255, 1);
+
 .banner {
   margin: 0 auto;
   background-image: url("./20190210_120856.jpg");
@@ -26,7 +30,7 @@
     align-self: flex-end;
     transform: translateY(25%);
     font-size: 3rem;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: fade-out($banner-main-color, 0.4);
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: -moz-none;
@@ -41,16 +45,22 @@
   &__desc {
     font-family: "Montserrat Subrayada", sans-serif;
     text-decoration: none;
-    color: white;
+    color: $banner-secondary-color;
+    transition: letter-spacing 200ms;
+    will-change: color, letter-spacing;
+  }
+  &__desc:hover {
+    color: darken($banner-secondary-color, 20%);
+    letter-spacing: 4px;
   }
   &__arrow {
     font-family: "Nanum Gothic", sans-serif;
-    color: rgba(255, 255, 255, 0.6);
+    color: fade-out($banner-secondary-color, 0.4);
     cursor: pointer;
     flex-basis: 10%;
   }
   &__arrow:hover {
-    color: white;
+    color: $banner-secondary-color;
   }
   &__navigation {
     align-self: flex-end;
@@ -59,18 +69,18 @@
     display: inline-block;
     width: 20px;
     height: 20px;
-    background-color: rgba(0, 0, 0, 0.6);
-    grid-area: 2 / 1 / 3 / 1;
+    background-color: fade-out($banner-main-color, 0.4);
     margin: 20px;
-    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 0 5px fade-out($banner-secondary-color, 0.4);
     border-radius: 50%;
+    align-self: flex-end;
     cursor: pointer;
   }
   &__dots:hover {
-    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 5px $banner-secondary-color;
   }
   &__dots--active {
-    border: 4px solid rgba(255, 255, 255, 1);
+    border: 4px solid $banner-secondary-color;
     transition: 0.5s;
   }
 }

@@ -24,7 +24,7 @@ const banner = [
 ];
 
 let active = 0; // slide number to start from
-let timer = 4000; //time between slide change
+const timer = 4000; //time between slide change
 window.addEventListener("DOMContentLoaded", () => {
   const changeSlide = () => {
     if (active >= banner.length) {
@@ -32,7 +32,7 @@ window.addEventListener("DOMContentLoaded", () => {
     } else if (active < 0) {
       active = banner.length - 1;
     }
-    bannerBackground.style.backgroundImage = `url(${banner[active]["img"]})`;
+    changeImg();
     changeHeader();
     changeDot();
     active++;
@@ -54,6 +54,12 @@ window.addEventListener("DOMContentLoaded", () => {
     header.setAttribute("target", "_blank");
     header.textContent = banner[active]["header"];
     bannerHeader.appendChild(header);
+  }
+
+  function changeImg() {
+    document.querySelector(
+      ".banner"
+    ).style.backgroundImage = `url(${banner[active]["img"]})`;
   }
   function clickDot() {
     clearInterval(setter);
@@ -87,7 +93,7 @@ window.addEventListener("DOMContentLoaded", () => {
     setter = setInterval(changeSlide, timer);
   }
 
-  const createDots = () => {
+  const createBanner = () => {
     let dot = "";
     for (let i = 0; i < banner.length; i++) {
       dot = document.createElement("span");
@@ -97,13 +103,13 @@ window.addEventListener("DOMContentLoaded", () => {
       document.querySelector(".banner__navigation").appendChild(dot);
     }
     changeHeader();
+    changeImg();
   };
-  createDots();
+  createBanner();
   const dots = [...document.querySelectorAll(".banner__dots")];
   let setter = setInterval(changeSlide, timer);
   arrows.forEach((arrow) => arrow.addEventListener("click", clickArrow));
 });
 
-const bannerBackground = document.querySelector(".banner");
 const bannerHeader = document.querySelector(".banner__title");
 const arrows = [...document.querySelectorAll(".banner__arrow")];
