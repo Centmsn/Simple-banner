@@ -1,5 +1,108 @@
-//interface
-const banner = [
+class Banner {
+  constructor(active, timer, config) {
+    this.active = active; // slide number to start from
+    this.timer = timer; //time between slide change
+    this.config = config; //configuration object
+    this.setter = setInterval(this.changeSlide, timer);
+    this.dots = "";
+
+    this.createBanner();
+  }
+
+  createBanner = () => {
+    let dot = "";
+    for (let i = 0; i < this.config.length; i++) {
+      dot = document.createElement("span");
+      dot.addEventListener("click", this.clickDot);
+      dot.classList.add("banner__dots");
+      i === this.active ? dot.classList.add("banner__dots--active") : null;
+      document.querySelector(".banner__navigation").appendChild(dot);
+    }
+
+    document
+      .querySelectorAll(".banner__arrow")
+      .forEach((arrow) => arrow.addEventListener("click", this.clickArrow));
+
+    this.dots = [...document.querySelectorAll(".banner__dots")];
+    this.changeHeader();
+    this.changeImg();
+    this.changeDot();
+  };
+
+  changeHeader = () => {
+    const bannerHeader = document.querySelector(".banner__title");
+    bannerHeader.innerHTML = "";
+    const header = document.createElement("a");
+    header.classList.add("banner__desc");
+    header.setAttribute("href", this.config[this.active]["link"]);
+    header.setAttribute("target", "_blank");
+    header.textContent = this.config[this.active]["header"];
+    bannerHeader.appendChild(header);
+  };
+
+  changeImg = () => {
+    document.querySelector(".banner").style.backgroundImage = `url(${
+      this.config[this.active]["img"]
+    })`;
+  };
+
+  //sets active class for dot span
+  changeDot = () => {
+    let activeIndex = this.dots.findIndex((dot) =>
+      dot.classList.contains("banner__dots--active")
+    );
+    this.dots[activeIndex].classList.remove("banner__dots--active");
+    this.dots[this.active].classList.add("banner__dots--active");
+  };
+
+  changeSlide = () => {
+    if (this.active >= this.config.length) {
+      this.active = 0;
+    } else if (this.active < 0) {
+      this.active = this.config.length - 1;
+    }
+    this.changeImg();
+    this.changeHeader();
+    this.changeDot();
+    this.active++;
+  };
+
+  clickDot = () => {
+    clearInterval(this.setter);
+    if (event.target.classList.contains("banner__dots--active")) {
+      this.setter = setInterval(this.changeSlide, this.timer);
+    } else {
+      this.active = this.dots.indexOf(event.target);
+      this.changeSlide();
+      this.setter = setInterval(this.changeSlide, this.timer);
+    }
+  };
+
+  clickArrow = () => {
+    clearInterval(this.setter);
+    const activeDot = this.dots.findIndex((dot) =>
+      dot.classList.contains("banner__dots--active")
+    );
+    if (event.target.dataset.direction === "left") {
+      if (activeDot > 0) {
+        this.active = activeDot - 1;
+      } else {
+        this.active = this.config.length - 1;
+      }
+    } else {
+      if (activeDot < this.config.length - 1) {
+        this.active = activeDot + 1;
+      } else {
+        this.active = 0;
+      }
+    }
+    this.changeSlide();
+    this.setter = setInterval(this.changeSlide, this.timer);
+  };
+}
+
+//config object
+const config = [
   {
     img: "./20190210_120856.jpg", //0
     header: "First forest photo",
@@ -23,93 +126,4 @@ const banner = [
   // },
 ];
 
-let active = 0; // slide number to start from
-const timer = 4000; //time between slide change
-window.addEventListener("DOMContentLoaded", () => {
-  const changeSlide = () => {
-    if (active >= banner.length) {
-      active = 0;
-    } else if (active < 0) {
-      active = banner.length - 1;
-    }
-    changeImg();
-    changeHeader();
-    changeDot();
-    active++;
-  };
-  //sets active class for dot span
-  const changeDot = () => {
-    let activeIndex = dots.findIndex((dot) =>
-      dot.classList.contains("banner__dots--active")
-    );
-    dots[activeIndex].classList.remove("banner__dots--active");
-    dots[active].classList.add("banner__dots--active");
-  };
-
-  function changeHeader() {
-    bannerHeader.innerHTML = "";
-    const header = document.createElement("a");
-    header.classList.add("banner__desc");
-    header.setAttribute("href", banner[active]["link"]);
-    header.setAttribute("target", "_blank");
-    header.textContent = banner[active]["header"];
-    bannerHeader.appendChild(header);
-  }
-
-  function changeImg() {
-    document.querySelector(
-      ".banner"
-    ).style.backgroundImage = `url(${banner[active]["img"]})`;
-  }
-  function clickDot() {
-    clearInterval(setter);
-    if (this.classList.contains("banner__dots--active")) {
-      setter = setInterval(changeSlide, timer);
-    } else {
-      active = dots.indexOf(this);
-      changeSlide();
-      setter = setInterval(changeSlide, timer);
-    }
-  }
-  function clickArrow() {
-    clearInterval(setter);
-    const activeDot = dots.findIndex((dot) =>
-      dot.classList.contains("banner__dots--active")
-    );
-    if (this.dataset.direction === "left") {
-      if (activeDot > 0) {
-        active = activeDot - 1;
-      } else {
-        active = banner.length - 1;
-      }
-    } else {
-      if (activeDot < banner.length - 1) {
-        active = activeDot + 1;
-      } else {
-        active = 0;
-      }
-    }
-    changeSlide();
-    setter = setInterval(changeSlide, timer);
-  }
-
-  const createBanner = () => {
-    let dot = "";
-    for (let i = 0; i < banner.length; i++) {
-      dot = document.createElement("span");
-      dot.addEventListener("click", clickDot);
-      dot.classList.add("banner__dots");
-      i === active ? dot.classList.add("banner__dots--active") : null;
-      document.querySelector(".banner__navigation").appendChild(dot);
-    }
-    changeHeader();
-    changeImg();
-  };
-  createBanner();
-  const dots = [...document.querySelectorAll(".banner__dots")];
-  let setter = setInterval(changeSlide, timer);
-  arrows.forEach((arrow) => arrow.addEventListener("click", clickArrow));
-});
-
-const bannerHeader = document.querySelector(".banner__title");
-const arrows = [...document.querySelectorAll(".banner__arrow")];
+window.addEventListener("DOMContentLoaded", () => new Banner(2, 4000, config));
