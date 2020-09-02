@@ -1,7 +1,7 @@
 class Banner {
   constructor(config) {
     this.config = config;
-    this.setter = "";
+    this.setter = setInterval(this.changeSlide, this.config.timer);
     this.dots = "";
 
     this.createBanner();
@@ -76,6 +76,7 @@ class Banner {
     this.changeHeader();
     this.changeDot();
     this.config.startSlide++;
+    console.log(this.setter);
   };
 
   clickDot = () => {
@@ -141,5 +142,4 @@ const config = {
   ],
 };
 
-// refactor config object to contain all parameters
 window.addEventListener("DOMContentLoaded", () => new Banner(config));
