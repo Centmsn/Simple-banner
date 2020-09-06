@@ -22,6 +22,12 @@ $banner-secondary-color: rgba(255, 255, 255, 1);
   transition: background-image 100ms;
   max-width: 1200px;
   max-height: 800px;
+  // media for basic responsivness
+  @media screen and (max-width: 800px) {
+    width: 100vw;
+    height: 50vh;
+  }
+
   &__central-box {
     display: flex;
     align-items: center;

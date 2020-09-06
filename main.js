@@ -1,21 +1,58 @@
 class Banner {
   constructor(config) {
     this.config = config;
-    this.setter = setInterval(this.changeSlide, this.config.timer);
+    this.setter = "";
     this.dots = "";
 
     this.createBanner();
   }
 
   createBanner = () => {
-    if (
+    if (this.config.slides.length === 0) {
+      throw new Error(
+        "Config error: slides must containt at least one element"
+      );
+    } else if (
       this.config.startSlide < 0 ||
       this.config.startSlide > this.config.startSlide.length
     ) {
-      throw new Error("Incorrect startSlide number");
+      throw new Error("Config error: incorrect startSlide number");
     } else if (this.config.timer < 100) {
-      throw new Error("Incorrect timer number. Please use number > 100");
+      throw new Error("Config error: incorrect timer number. Use number > 100");
     } else {
+      const bannerBase = document.createElement("div");
+      bannerBase.classList.add("banner");
+
+      const bannerCentralBox = document.createElement("div");
+      bannerCentralBox.classList.add("banner__central-box");
+
+      const bannerTitle = document.createElement("div");
+      bannerTitle.classList.add("banner__title");
+
+      const bannerNavigation = document.createElement("div");
+      bannerNavigation.classList.add("banner__navigation");
+
+      const bannerLeftArrow = document.createElement("div");
+      bannerLeftArrow.classList.add("banner__arrow");
+      bannerLeftArrow.dataset.direction = "left";
+      bannerLeftArrow.innerHTML = "&lt;";
+
+      const bannerRightArrow = document.createElement("div");
+      bannerRightArrow.classList.add("banner__arrow");
+      bannerRightArrow.dataset.direction = "right";
+      bannerRightArrow.innerHTML = "&gt;";
+
+      bannerCentralBox.appendChild(bannerLeftArrow);
+      bannerCentralBox.appendChild(bannerTitle);
+      bannerCentralBox.appendChild(bannerRightArrow);
+      bannerBase.appendChild(bannerCentralBox);
+      bannerBase.appendChild(bannerNavigation);
+
+      document
+        .querySelector(`.${this.config.rootElement}`)
+        .appendChild(bannerBase);
+
+      this.setter = setInterval(this.changeSlide, this.config.timer);
       let dot = "";
       for (let i = 0; i < this.config.slides.length; i++) {
         dot = document.createElement("span");
@@ -76,7 +113,6 @@ class Banner {
     this.changeHeader();
     this.changeDot();
     this.config.startSlide++;
-    console.log(this.setter);
   };
 
   clickDot = () => {
@@ -114,9 +150,10 @@ class Banner {
 }
 
 //config object
-const config = {
+const bannerConfig = {
+  rootElement: "banner-container", // class name of root element
   startSlide: 2, // first image to be displayed
-  timer: 2000, //time beetwen each slide change in ms
+  timer: 4500, //time beetwen each slide change / use ms only
   slides: [
     {
       img: "./20190210_120856.jpg", //0
@@ -142,4 +179,4 @@ const config = {
   ],
 };
 
-window.addEventListener("DOMContentLoaded", () => new Banner(config));
+window.addEventListener("DOMContentLoaded", () => new Banner(bannerConfig));
