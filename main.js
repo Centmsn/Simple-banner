@@ -1,8 +1,6 @@
 class Banner {
   constructor(config) {
     this.config = config;
-    this.setter = "";
-    this.dots = "";
 
     this.createBanner();
   }
@@ -52,7 +50,7 @@ class Banner {
         .querySelector(`.${this.config.rootElement}`)
         .appendChild(bannerBase);
 
-      this.setter = setInterval(this.changeSlide, this.config.timer);
+      this.intervalId = setInterval(this.changeSlide, this.config.timer);
       let dot = "";
       for (let i = 0; i < this.config.slides.length; i++) {
         dot = document.createElement("span");
@@ -115,19 +113,19 @@ class Banner {
     this.config.startSlide++;
   };
 
-  clickDot = () => {
-    clearInterval(this.setter);
-    if (event.target.classList.contains("banner__dots--active")) {
-      this.setter = setInterval(this.changeSlide, this.config.timer);
+  clickDot = (e) => {
+    clearInterval(this.intervalId);
+    if (e.target.classList.contains("banner__dots--active")) {
+      this.intervalId = setInterval(this.changeSlide, this.config.timer);
     } else {
       this.config.startSlide = this.dots.indexOf(event.target);
       this.changeSlide();
-      this.setter = setInterval(this.changeSlide, this.config.timer);
+      this.intervalId = setInterval(this.changeSlide, this.config.timer);
     }
   };
 
   clickArrow = () => {
-    clearInterval(this.setter);
+    clearInterval(this.intervalId);
     const activeDot = this.dots.findIndex((dot) =>
       dot.classList.contains("banner__dots--active")
     );
@@ -145,7 +143,7 @@ class Banner {
       }
     }
     this.changeSlide();
-    this.setter = setInterval(this.changeSlide, this.config.timer);
+    this.intervalId = setInterval(this.changeSlide, this.config.timer);
   };
 }
 
@@ -179,4 +177,4 @@ const bannerConfig = {
   ],
 };
 
-window.addEventListener("DOMContentLoaded", () => new Banner(bannerConfig));
+document.addEventListener("DOMContentLoaded", () => new Banner(bannerConfig));
