@@ -75,14 +75,25 @@ $banner-secondary-color: rgba(255, 255, 255, 1);
     flex-basis: 10%;
 
     font-family: "Nanum Gothic", sans-serif;
+    font-size: 3rem;
+
+    border: none;
+    background: none;
+    outline: none;
 
     color: fade-out($banner-secondary-color, 0.4);
 
     cursor: pointer;
+
+    &:hover {
+      color: $banner-secondary-color;
+    }
+
+    &:focus {
+      color: $banner-secondary-color;
+    }
   }
-  &__arrow:hover {
-    color: $banner-secondary-color;
-  }
+
   &__navigation {
     align-self: flex-end;
   }

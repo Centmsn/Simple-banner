@@ -11,7 +11,7 @@ class Banner {
    * @param {Object[]} config.slides - slide details
    * @param {string} config.slides.img - path to image
    * @param {string} config.slides.header - slide header
-   * @param {string} config.slides.link - header link
+   * @param {string} [config.slides.link] - header link / if not provided header will be displayed as <h2>
    */
   constructor(config) {
     /**@private */
@@ -60,6 +60,7 @@ class Banner {
         `Config error: incorrect timer number. Number must be > 100 but got ${timer}`
       );
     } else {
+      //* create basic HTML structure
       const bannerBase = document.createElement("div");
       bannerBase.classList.add("banner");
 
@@ -72,18 +73,18 @@ class Banner {
       const bannerNavigation = document.createElement("div");
       bannerNavigation.classList.add("banner__navigation");
 
-      const bannerLeftArrow = document.createElement("div");
+      //* create left arrow
+      const bannerLeftArrow = document.createElement("button");
       bannerLeftArrow.classList.add("banner__arrow");
-      bannerLeftArrow.dataset.direction = "left";
       bannerLeftArrow.innerHTML = "&lt;";
       bannerLeftArrow.addEventListener(
         "click",
         () => (this.activeSlide = this._activeSlide - 1)
       );
 
-      const bannerRightArrow = document.createElement("div");
+      //* create right arrow
+      const bannerRightArrow = document.createElement("button");
       bannerRightArrow.classList.add("banner__arrow");
-      bannerRightArrow.dataset.direction = "right";
       bannerRightArrow.innerHTML = "&gt;";
       bannerRightArrow.addEventListener(
         "click",
@@ -113,20 +114,26 @@ class Banner {
   };
 
   /**
-   * Changes current header
+   * Removes previous header and creates new one
    * @param {number} index - slide index in the config.slides
    * @return {undefined}
    */
   changeHeader = (index) => {
-    // TODO: refactor - do not create new element every time slide changes
-    const bannerHeader = document.querySelector(".banner__title");
-    bannerHeader.innerHTML = "";
-    const header = document.createElement("a");
+    let header;
+
+    const bannerHeader = this._root.querySelector(".banner__title");
+    bannerHeader.textContent = "";
+    if (this._config.slides[index].link) {
+      header = document.createElement("a");
+      header.setAttribute("href", this._config.slides[index]["link"]);
+      header.setAttribute("target", "_blank");
+    } else {
+      header = document.createElement("h2");
+    }
+
     header.classList.add("banner__desc");
-    header.setAttribute("href", this._config.slides[index]["link"]);
-    header.setAttribute("target", "_blank");
-    header.textContent = this._config.slides[index]["header"];
     bannerHeader.appendChild(header);
+    header.textContent = this._config.slides[index]["header"];
   };
 
   /**
@@ -178,7 +185,7 @@ const bannerConfig = {
     {
       img: "./20190210_120856.jpg", //0
       header: "First forest photo",
-      link: "https://github.com",
+      link: "https://github.com", //optional - if not provided header will be displayed as <h2>
     },
     {
       img: "./IMG_20161030_105321.jpg", //1
