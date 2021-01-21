@@ -10,18 +10,23 @@ $banner-secondary-color: rgba(255, 255, 255, 1);
 
 .banner {
   margin: 0 auto;
-  background-image: url("./20190210_120856.jpg");
+
   width: 75vw;
+  max-width: 1200px;
   height: 60vh;
+  max-height: 800px;
+
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+
+  background-image: url("./20190210_120856.jpg");
   background-size: cover;
   background-position-x: 50%;
   background-position-y: 50%;
+
   transition: background-image 100ms;
-  max-width: 1200px;
-  max-height: 800px;
+
   // media for basic responsivness
   @media screen and (max-width: 800px) {
     width: 100vw;
@@ -29,14 +34,17 @@ $banner-secondary-color: rgba(255, 255, 255, 1);
   }
 
   &__central-box {
-    display: flex;
-    align-items: center;
-    text-align: center;
     flex-basis: 100%;
     align-self: flex-end;
     transform: translateY(25%);
+
+    display: flex;
+    align-items: center;
+    text-align: center;
+
     font-size: 3rem;
     background-color: fade-out($banner-main-color, 0.4);
+
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: -moz-none;
@@ -45,25 +53,32 @@ $banner-secondary-color: rgba(255, 255, 255, 1);
   }
   &__title {
     flex-basis: 80%;
+
     font-size: 2rem;
     padding: 20px;
   }
   &__desc {
     font-family: "Montserrat Subrayada", sans-serif;
     text-decoration: none;
+
     color: $banner-secondary-color;
+
     transition: letter-spacing 200ms;
     will-change: color, letter-spacing;
   }
   &__desc:hover {
     color: darken($banner-secondary-color, 20%);
+
     letter-spacing: 4px;
   }
   &__arrow {
-    font-family: "Nanum Gothic", sans-serif;
-    color: fade-out($banner-secondary-color, 0.4);
-    cursor: pointer;
     flex-basis: 10%;
+
+    font-family: "Nanum Gothic", sans-serif;
+
+    color: fade-out($banner-secondary-color, 0.4);
+
+    cursor: pointer;
   }
   &__arrow:hover {
     color: $banner-secondary-color;
@@ -72,14 +87,16 @@ $banner-secondary-color: rgba(255, 255, 255, 1);
     align-self: flex-end;
   }
   &__dots {
-    display: inline-block;
+    margin: 20px;
     width: 20px;
     height: 20px;
-    background-color: fade-out($banner-main-color, 0.4);
-    margin: 20px;
+
+    display: inline-block;
+
     box-shadow: 0 0 0 5px fade-out($banner-secondary-color, 0.4);
     border-radius: 50%;
-    align-self: flex-end;
+
+    background-color: fade-out($banner-main-color, 0.4);
     cursor: pointer;
   }
   &__dots:hover {

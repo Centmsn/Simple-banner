@@ -1,22 +1,64 @@
+/**
+ * Renders banner in the root element
+ */
 class Banner {
+  /**
+   * Creates banner
+   * @param {Object} config - configuration object
+   * @param {string} config.rootElement - a class selector for root element. Do not use . (dot) before class name
+   * @param {number} [config.startSlide = 0] - first slide to be displayed
+   * @param {number} config.timer - times between slide change. Use ms only
+   * @param {Object[]} config.slides - slide details
+   * @param {string} config.slides.img - path to image
+   * @param {string} config.slides.header - slide header
+   * @param {string} config.slides.link - header link
+   */
   constructor(config) {
-    this.config = config;
+    /**@private */
+    this._config = config;
+    /**@private */
+    this._root = document.querySelector(`.${config.rootElement}`);
+    /**@private */
+    this._activeSlide = this._config.startSlide || 0;
 
     this.createBanner();
   }
 
+  /**
+   * Determines which slide should be visible
+   * @type {number}
+   */
+  set activeSlide(id) {
+    const length = this._config.slides.length - 1;
+
+    if (id > length) id = 0;
+    else if (id < 0) id = length;
+
+    this._activeSlide = id;
+
+    this.changeSlide(id);
+  }
+
+  /**
+   * Setup function - creates HTML structure for banner, adds listeners to HTML elements
+   * @return {undefined}
+   */
   createBanner = () => {
-    if (this.config.slides.length === 0) {
+    const { slides, timer } = this._config;
+
+    if (slides.length === 0) {
       throw new Error(
         "Config error: slides must containt at least one element"
       );
     } else if (
-      this.config.startSlide < 0 ||
-      this.config.startSlide > this.config.startSlide.length
+      this._activeSlide < 0 ||
+      this._activeSlide > this._activeSlide.length
     ) {
       throw new Error("Config error: incorrect startSlide number");
-    } else if (this.config.timer < 100) {
-      throw new Error("Config error: incorrect timer number. Use number > 100");
+    } else if (timer < 100) {
+      throw new Error(
+        `Config error: incorrect timer number. Number must be > 100 but got ${timer}`
+      );
     } else {
       const bannerBase = document.createElement("div");
       bannerBase.classList.add("banner");
@@ -34,124 +76,104 @@ class Banner {
       bannerLeftArrow.classList.add("banner__arrow");
       bannerLeftArrow.dataset.direction = "left";
       bannerLeftArrow.innerHTML = "&lt;";
+      bannerLeftArrow.addEventListener(
+        "click",
+        () => (this.activeSlide = this._activeSlide - 1)
+      );
 
       const bannerRightArrow = document.createElement("div");
       bannerRightArrow.classList.add("banner__arrow");
       bannerRightArrow.dataset.direction = "right";
       bannerRightArrow.innerHTML = "&gt;";
+      bannerRightArrow.addEventListener(
+        "click",
+        () => (this.activeSlide = this._activeSlide + 1)
+      );
 
-      bannerCentralBox.appendChild(bannerLeftArrow);
-      bannerCentralBox.appendChild(bannerTitle);
-      bannerCentralBox.appendChild(bannerRightArrow);
-      bannerBase.appendChild(bannerCentralBox);
-      bannerBase.appendChild(bannerNavigation);
+      bannerCentralBox.append(bannerLeftArrow, bannerTitle, bannerRightArrow);
+      bannerBase.append(bannerCentralBox, bannerNavigation);
 
-      document
-        .querySelector(`.${this.config.rootElement}`)
-        .appendChild(bannerBase);
+      this._root.append(bannerBase);
 
-      this.intervalId = setInterval(this.changeSlide, this.config.timer);
-      let dot = "";
-      for (let i = 0; i < this.config.slides.length; i++) {
+      let dot;
+      for (let i = 0; i < slides.length; i++) {
         dot = document.createElement("span");
-        dot.addEventListener("click", this.clickDot);
+        dot.addEventListener("click", () => (this.activeSlide = i));
         dot.classList.add("banner__dots");
-        i === this.config.startSlide
+        i === this._activeSlide
           ? dot.classList.add("banner__dots--active")
           : null;
         document.querySelector(".banner__navigation").appendChild(dot);
       }
 
-      document
-        .querySelectorAll(".banner__arrow")
-        .forEach((arrow) => arrow.addEventListener("click", this.clickArrow));
+      this.dots = [...this._root.querySelectorAll(".banner__dots")];
 
-      this.dots = [...document.querySelectorAll(".banner__dots")];
-      this.changeHeader();
-      this.changeImg();
-      this.changeDot();
+      this.changeSlide(this._activeSlide);
     }
   };
 
-  changeHeader = () => {
+  /**
+   * Changes current header
+   * @param {number} index - slide index in the config.slides
+   * @return {undefined}
+   */
+  changeHeader = (index) => {
+    // TODO: refactor - do not create new element every time slide changes
     const bannerHeader = document.querySelector(".banner__title");
     bannerHeader.innerHTML = "";
     const header = document.createElement("a");
     header.classList.add("banner__desc");
-    header.setAttribute(
-      "href",
-      this.config.slides[this.config.startSlide]["link"]
-    );
+    header.setAttribute("href", this._config.slides[index]["link"]);
     header.setAttribute("target", "_blank");
-    header.textContent = this.config.slides[this.config.startSlide]["header"];
+    header.textContent = this._config.slides[index]["header"];
     bannerHeader.appendChild(header);
   };
 
-  changeImg = () => {
-    document.querySelector(".banner").style.backgroundImage = `url(${
-      this.config.slides[this.config.startSlide]["img"]
-    })`;
+  /**
+   * Changes current image
+   * @param {number} index - slide index in the config.slides
+   * @return {undefined}
+   */
+  changeImg = (index) => {
+    this._root.querySelector(
+      ".banner"
+    ).style.backgroundImage = `url(${this._config.slides[index]["img"]})`;
   };
 
-  changeDot = () => {
-    let activeIndex = this.dots.findIndex((dot) =>
-      dot.classList.contains("banner__dots--active")
+  /**
+   * Removes active class from nav dots, then adds it to current dot
+   * @param {number} index - slide index in the config.slides
+   * @return {undefined}
+   */
+  changeDot = (index) => {
+    this.dots.forEach((dot) => dot.classList.remove("banner__dots--active"));
+    this.dots[index].classList.add("banner__dots--active");
+  };
+
+  /**
+   * Changes active image, nav dot, and header
+   * @param {number} index - slide index
+   * @return {undefined}
+   */
+  changeSlide = (index) => {
+    clearTimeout(this.timeoutId);
+
+    this.changeImg(index);
+    this.changeHeader(index);
+    this.changeDot(index);
+
+    this.timeoutId = setTimeout(
+      () => (this.activeSlide = index + 1),
+      this._config.timer
     );
-    this.dots[activeIndex].classList.remove("banner__dots--active");
-    this.dots[this.config.startSlide].classList.add("banner__dots--active");
-  };
-
-  changeSlide = () => {
-    if (this.config.startSlide >= this.config.slides.length) {
-      this.config.startSlide = 0;
-    } else if (this.config.startSlide < 0) {
-      this.config.startSlide = this.config.slides.length - 1;
-    }
-    this.changeImg();
-    this.changeHeader();
-    this.changeDot();
-    this.config.startSlide++;
-  };
-
-  clickDot = (e) => {
-    clearInterval(this.intervalId);
-    if (e.target.classList.contains("banner__dots--active")) {
-      this.intervalId = setInterval(this.changeSlide, this.config.timer);
-    } else {
-      this.config.startSlide = this.dots.indexOf(event.target);
-      this.changeSlide();
-      this.intervalId = setInterval(this.changeSlide, this.config.timer);
-    }
-  };
-
-  clickArrow = () => {
-    clearInterval(this.intervalId);
-    const activeDot = this.dots.findIndex((dot) =>
-      dot.classList.contains("banner__dots--active")
-    );
-    if (event.target.dataset.direction === "left") {
-      if (activeDot > 0) {
-        this.config.startSlide = activeDot - 1;
-      } else {
-        this.config.startSlide = this.config.slides.length - 1;
-      }
-    } else {
-      if (activeDot < this.config.slides.length - 1) {
-        this.config.startSlide = activeDot + 1;
-      } else {
-        this.config.startSlide = 0;
-      }
-    }
-    this.changeSlide();
-    this.intervalId = setInterval(this.changeSlide, this.config.timer);
   };
 }
 
 //config object
 const bannerConfig = {
   rootElement: "banner-container", // class name of root element
-  startSlide: 2, // first image to be displayed
-  timer: 4500, //time beetwen each slide change / use ms only
+  startSlide: 0, // first image to be displayed - optional
+  timer: 2500, //time beetwen each slide change / use ms only
   slides: [
     {
       img: "./20190210_120856.jpg", //0
@@ -168,6 +190,7 @@ const bannerConfig = {
       header: "Third forest photo",
       link: "https://github.com",
     },
+
     // add more slides
     // {
     //   img: "path",
