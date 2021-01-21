@@ -9,7 +9,7 @@ class Banner {
    * @param {number} [config.startSlide = 0] - first slide to be displayed
    * @param {number} config.timer - times between slide change. Use ms only
    * @param {Object[]} config.slides - slide details
-   * @param {string} config.slides.img - path to image
+   * @param {string} config.slides.imgPath - path to image
    * @param {string} config.slides.header - slide header
    * @param {string} [config.slides.link] - header link / if not provided header will be displayed as <h2>
    */
@@ -40,26 +40,55 @@ class Banner {
   }
 
   /**
+   * Validates user config object
+   * @param {Object} config
+   * @returns {boolean} - true if config is OK
+   */
+  validateConfig = (config) => {
+    const { slides, timer, rootElement } = config;
+
+    //* validate amount of slides
+    if (slides.length === 0) {
+      throw new Error(
+        `Config error: slides must containt at least one element`
+      );
+      //* validate if active slide is in range
+    } else if (
+      this._activeSlide < 0 ||
+      this._activeSlide > this._activeSlide.length
+    ) {
+      throw new Error(
+        `Config error: incorrect startSlide number. Num must be > 0 && < slides.length`
+      );
+      //* validate if timer is >100 && time is number
+    } else if (timer < 100 || typeof timer !== "number") {
+      throw new Error(
+        `Config error: incorrect timer number. Number must be > 100 but got ${timer}`
+      );
+      //* validate if rootElement exists in DOM
+    } else if (!document.querySelector(`.${rootElement}`)) {
+      throw new Error(
+        `Config error: rootElement not found. Check Your spelling.`
+      );
+      //* validate img path
+    } else if (typeof slides[0].imgPath !== "string") {
+      throw new Error(
+        `Config error: imgPath should be a string instead got ${typeof slides[0]
+          .imgPath}`
+      );
+    }
+    return true;
+  };
+
+  /**
    * Setup function - creates HTML structure for banner, adds listeners to HTML elements
    * @return {undefined}
    */
   createBanner = () => {
     const { slides, timer } = this._config;
+    const isValid = this.validateConfig(this._config);
 
-    if (slides.length === 0) {
-      throw new Error(
-        "Config error: slides must containt at least one element"
-      );
-    } else if (
-      this._activeSlide < 0 ||
-      this._activeSlide > this._activeSlide.length
-    ) {
-      throw new Error("Config error: incorrect startSlide number");
-    } else if (timer < 100) {
-      throw new Error(
-        `Config error: incorrect timer number. Number must be > 100 but got ${timer}`
-      );
-    } else {
+    if (isValid) {
       //* create basic HTML structure
       const bannerBase = document.createElement("div");
       bannerBase.classList.add("banner");
@@ -144,7 +173,7 @@ class Banner {
   changeImg = (index) => {
     this._root.querySelector(
       ".banner"
-    ).style.backgroundImage = `url(${this._config.slides[index]["img"]})`;
+    ).style.backgroundImage = `url(${this._config.slides[index]["imgPath"]})`;
   };
 
   /**
@@ -183,24 +212,24 @@ const bannerConfig = {
   timer: 2500, //time beetwen each slide change / use ms only
   slides: [
     {
-      img: "./20190210_120856.jpg", //0
+      imgPath: "./20190210_120856.jpg", //0
       header: "First forest photo",
       link: "https://github.com", //optional - if not provided header will be displayed as <h2>
     },
     {
-      img: "./IMG_20161030_105321.jpg", //1
+      imgPath: "./IMG_20161030_105321.jpg", //1
       header: "Second Forest photo",
       link: "https://github.com",
     },
     {
-      img: "./IMG_20161030_115455.jpg", //2
+      imgPath: "./IMG_20161030_115455.jpg", //2
       header: "Third forest photo",
       link: "https://github.com",
     },
 
     // add more slides
     // {
-    //   img: "path",
+    //   imgPath: "path",
     //   header: "description",
     //   link: "link",
     // },
